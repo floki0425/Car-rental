@@ -1,16 +1,48 @@
-# React + Vite
+﻿# DriveGo Car Rental Inquiry Website
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern mobile-first car rental inquiry website built with React, Tailwind CSS, React Router, Supabase, and Resend.
 
-Currently, two official plugins are available:
+## Git
+1. Clone
+```bash
+git clone <your-repo-url>
+cd car_rental_website
+```
+2. Install
+```bash
+npm install
+```
+3. Run locally
+```bash
+npm run dev
+```
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Environment Variables
+Copy `.env.example` to `.env` and set:
+- `VITE_SUPABASE_URL`
+- `VITE_SUPABASE_ANON_KEY`
+- `RESEND_API_KEY`
+- `ADMIN_EMAIL`
+- `WHATSAPP_NUMBER`
 
-## React Compiler
+## Supabase Migration and Seed
+Run SQL from:
+- `supabase/migrations/20260528170000_init_car_rental.sql`
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Edge Function Setup
+```bash
+supabase link --project-ref <project-ref>
+supabase secrets set RESEND_API_KEY=your_key ADMIN_EMAIL=you@example.com
+supabase functions deploy send-booking-email
+```
 
-## Expanding the ESLint configuration
+## Deploy
+- Deploy frontend to Vercel/Netlify.
+- Add frontend env vars there (`VITE_...`, `WHATSAPP_NUMBER`).
+- Keep `RESEND_API_KEY` only in Supabase function secrets.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Suggested Git Workflow
+1. `git checkout -b codex/drivego-build`
+2. Make milestone commits.
+3. Push and open PR.
+
