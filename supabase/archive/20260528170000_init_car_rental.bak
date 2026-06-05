@@ -22,6 +22,8 @@ create table if not exists public.cars (
 create table if not exists public.booking_inquiries (
   id uuid primary key default gen_random_uuid(),
   car_id uuid references public.cars(id),
+  car_name_snapshot text,
+  car_price_snapshot numeric,
   full_name text not null,
   email text not null,
   phone text not null,
@@ -31,8 +33,24 @@ create table if not exists public.booking_inquiries (
   rental_option text not null,
   message text,
   status text default 'new',
-  created_at timestamp default now()
+  created_at timestamp default now(),
+  constraint booking_inquiries_rental_option_check check (rental_option in ('Self Drive', 'With Driver')),
+  constraint booking_inquiries_date_check check (return_date >= pickup_date)
 );
+
+alter table public.booking_inquiries
+  add column if not exists car_name_snapshot text,
+  add column if not exists car_price_snapshot numeric;
+
+alter table public.booking_inquiries
+  drop constraint if exists booking_inquiries_rental_option_check;
+alter table public.booking_inquiries
+  add constraint booking_inquiries_rental_option_check check (rental_option in ('Self Drive', 'With Driver'));
+
+alter table public.booking_inquiries
+  drop constraint if exists booking_inquiries_date_check;
+alter table public.booking_inquiries
+  add constraint booking_inquiries_date_check check (return_date >= pickup_date);
 
 alter table public.cars enable row level security;
 alter table public.booking_inquiries enable row level security;
@@ -53,4 +71,3 @@ values
 ('Toyota Hiace', 'toyota-hiace', 'Van', 'Manual', 'Diesel', 12, 4, 2800, 'https://images.unsplash.com/photo-1486496572940-2bb2341fdbdf?auto=format&fit=crop&w=1200&q=80', array['https://images.unsplash.com/photo-1486496572940-2bb2341fdbdf?auto=format&fit=crop&w=1200&q=80'], 'Reliable transport van ideal for group travel.', array['Large Cabin','Cold AC','Extra Luggage Space'], array['Valid ID','Driver License','Security Deposit'], true),
 ('Toyota Fortuner', 'toyota-fortuner', 'SUV', 'Automatic', 'Diesel', 7, 5, 3500, 'https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=80', array['https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=crop&w=1200&q=80'], 'Premium SUV for road trips and executive rides.', array['Leather Seats','Cruise Control','Advanced Safety'], array['Valid ID','Driver License','Security Deposit'], true)
 on conflict (slug) do nothing;
-
