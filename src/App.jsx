@@ -2,6 +2,9 @@
 import Header from './components/Header'
 import Footer from './components/Footer'
 import WhatsAppButton from './components/WhatsAppButton'
+import ScrollToTop from './components/ScrollToTop'
+import TrackingProvider from './components/TrackingProvider'
+
 import LandingPage from './pages/LandingPage'
 import CarsPage from './pages/CarsPage'
 import CarDetailsPage from './pages/CarDetailsPage'
@@ -10,7 +13,9 @@ import ThankYouPage from './pages/ThankYouPage'
 
 function App() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-[#F7F3EC] text-[#111111]">
+      <ScrollToTop />
+      <TrackingProvider />
       <Header />
       <main>
         <Routes>
@@ -28,4 +33,3 @@ function App() {
 }
 
 export default App
-
