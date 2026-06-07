@@ -188,7 +188,7 @@ function TripField({
         {label}
       </span>
 
-      <span className="flex h-14 items-center gap-3 rounded-none border border-gray-200 bg-white px-5 shadow-[0_14px_35px_rgba(0,0,0,0.06)] transition focus-within:border-black focus-within:ring-4 focus-within:ring-gray-300">
+      <span className="flex h-14 items-center gap-3 rounded-md border border-white/60 bg-white/75 px-5 shadow-[0_14px_35px_rgba(0,0,0,0.08)] backdrop-blur-xl transition focus-within:border-black focus-within:ring-4 focus-within:ring-gray-300">
         <LandingIcon name={icon} className="h-5 w-5 shrink-0 text-gray-700" />
 
         <input
@@ -216,7 +216,7 @@ function PickupDateField({ value, onOpen }) {
       <button
         type="button"
         onClick={onOpen}
-        className="flex h-14 items-center gap-3 rounded-none border border-gray-200 bg-white px-5 text-left shadow-[0_14px_35px_rgba(0,0,0,0.06)] transition hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-300"
+        className="flex h-14 items-center gap-3 rounded-md border border-white/60 bg-white/75 px-5 text-left shadow-[0_14px_35px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-300"
       >
         <LandingIcon name="calendar" className="h-5 w-5 shrink-0 text-gray-700" />
         <span className="min-w-0 flex-1 text-sm font-semibold text-gray-900">
@@ -240,7 +240,7 @@ function ReturnDateField({ value, onOpen }) {
       <button
         type="button"
         onClick={onOpen}
-        className="flex h-14 items-center gap-3 rounded-none border border-gray-200 bg-white px-5 text-left shadow-[0_14px_35px_rgba(0,0,0,0.06)] transition hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-300"
+        className="flex h-14 items-center gap-3 rounded-md border border-white/60 bg-white/75 px-5 text-left shadow-[0_14px_35px_rgba(0,0,0,0.08)] backdrop-blur-xl transition hover:border-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-300"
       >
         <LandingIcon name="calendar" className="h-5 w-5 shrink-0 text-gray-700" />
         <span className="min-w-0 flex-1 text-sm font-semibold text-gray-900">
@@ -288,17 +288,17 @@ function PickupDatePicker({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 px-4 py-6"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/35 px-4 py-6 backdrop-blur-sm"
       onMouseDown={onCancel}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="pickup-date-picker-title"
-        className="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-auto rounded-none border border-gray-200 bg-white shadow-xl"
+        className="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-auto rounded-lg border border-white/60 bg-white/85 shadow-[0_24px_80px_rgba(0,0,0,0.24)] backdrop-blur-xl"
         onMouseDown={(event) => event.stopPropagation()}
       >
-        <div className="rounded-none bg-gray-900 px-6 py-5 text-white">
+        <div className="rounded-t-lg bg-gray-900 px-6 py-5 text-white">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p
@@ -314,7 +314,7 @@ function PickupDatePicker({
             <button
               type="button"
               onClick={onCancel}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none border border-white/20 text-lg font-black text-white transition hover:bg-white hover:text-gray-900"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-white/20 text-lg font-black text-white transition hover:bg-white hover:text-gray-900"
               aria-label="Close pickup date picker"
             >
               x
@@ -334,7 +334,7 @@ function PickupDatePicker({
             <button
               type="button"
               onClick={() => changeMonth(-1)}
-              className="flex h-9 w-9 items-center justify-center rounded-none border border-gray-200 text-gray-700 transition hover:bg-gray-100"
+              className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700 transition hover:bg-gray-100"
               aria-label="Show previous month"
             >
               <span aria-hidden="true">&lt;</span>
@@ -345,7 +345,7 @@ function PickupDatePicker({
             <button
               type="button"
               onClick={() => changeMonth(1)}
-              className="flex h-9 w-9 items-center justify-center rounded-none border border-gray-200 text-gray-700 transition hover:bg-gray-100"
+              className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700 transition hover:bg-gray-100"
               aria-label="Show next month"
             >
               <span aria-hidden="true">&gt;</span>
@@ -358,7 +358,7 @@ function PickupDatePicker({
             ))}
           </div>
 
-          <div className="mt-3 grid grid-cols-7 border border-gray-200">
+          <div className="mt-3 grid grid-cols-7 gap-1 rounded-lg border border-gray-200 bg-white/60 p-1">
             {calendarDays.map((date) => {
               const dateString = formatLocalDate(date)
               const isCurrentMonth = date.getMonth() === visibleMonth.getMonth()
@@ -370,7 +370,7 @@ function PickupDatePicker({
                   type="button"
                   onClick={() => onSelectDate(dateString)}
                   className={[
-                    'flex aspect-square items-center justify-center border border-gray-100 text-sm font-bold transition',
+                    'flex aspect-square items-center justify-center rounded-md border border-gray-100 text-sm font-bold transition',
                     isSelected
                       ? 'bg-gray-900 text-white'
                       : 'bg-white text-gray-700 hover:bg-gray-100',
@@ -383,7 +383,7 @@ function PickupDatePicker({
             })}
           </div>
 
-          <div className="mt-6 rounded-none border border-gray-200 bg-gray-100 p-4">
+          <div className="mt-6 rounded-lg border border-gray-200 bg-gray-100/90 p-4 backdrop-blur-sm">
             <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-gray-500">
               Pickup Time
             </p>
@@ -394,7 +394,7 @@ function PickupDatePicker({
                   type="button"
                   onClick={() => setPickupTime(time)}
                   className={[
-                    'rounded-none border px-3 py-2 text-sm font-bold transition',
+                    'rounded-md border px-3 py-2 text-sm font-bold transition',
                     pickupTime === time
                       ? 'border-gray-900 bg-gray-900 text-white'
                       : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
@@ -410,14 +410,14 @@ function PickupDatePicker({
             <button
               type="button"
               onClick={onCancel}
-              className="inline-flex h-11 items-center justify-center rounded-none border border-gray-200 bg-white px-5 text-sm font-black text-gray-800 transition hover:bg-gray-100"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-gray-200 bg-white px-5 text-sm font-black text-gray-800 transition hover:bg-gray-100"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={onConfirm}
-              className="inline-flex h-11 items-center justify-center rounded-none bg-gray-900 px-5 text-sm font-black text-white transition hover:bg-gray-700"
+              className="inline-flex h-11 items-center justify-center rounded-md bg-gray-900 px-5 text-sm font-black text-white transition hover:bg-gray-700"
             >
               Confirm
             </button>
@@ -462,14 +462,14 @@ function DurationPicker({
 
   return (
     <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/40 px-4 py-6"
+      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/35 px-4 py-6 backdrop-blur-sm"
       onMouseDown={onCancel}
     >
       <div
         role="dialog"
         aria-modal="true"
         aria-labelledby="duration-picker-title"
-        className="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-auto rounded-none border border-gray-200 bg-white shadow-xl"
+        className="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-auto rounded-lg border border-white/60 bg-white/85 shadow-[0_24px_80px_rgba(0,0,0,0.24)] backdrop-blur-xl"
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="border-b border-gray-200 px-6 py-5">
@@ -488,7 +488,7 @@ function DurationPicker({
             <button
               type="button"
               onClick={onCancel}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-none border border-gray-200 text-lg font-black text-gray-700 transition hover:bg-gray-100"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-gray-200 text-lg font-black text-gray-700 transition hover:bg-gray-100"
               aria-label="Close duration picker"
             >
               x
@@ -497,13 +497,13 @@ function DurationPicker({
         </div>
 
         <div className="p-6">
-          <div className="rounded-none border border-gray-300 bg-gray-100 p-4">
+          <div className="rounded-lg border border-gray-300 bg-gray-100/90 p-4 backdrop-blur-sm">
             <div className="flex items-center justify-between gap-4">
               <button
                 type="button"
                 onClick={decreaseDuration}
                 disabled={durationDays <= 1}
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none border border-gray-300 bg-white text-2xl font-black text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-2xl font-black text-gray-700 transition hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="Decrease rental duration"
               >
                 -
@@ -516,7 +516,7 @@ function DurationPicker({
               <button
                 type="button"
                 onClick={increaseDuration}
-                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-none border border-gray-300 bg-white text-2xl font-black text-gray-700 transition hover:bg-gray-200"
+                className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-gray-300 bg-white text-2xl font-black text-gray-700 transition hover:bg-gray-200"
                 aria-label="Increase rental duration"
               >
                 +
@@ -524,7 +524,7 @@ function DurationPicker({
             </div>
           </div>
 
-          <label className="mt-5 flex items-center justify-between gap-4 border border-gray-200 bg-white p-4">
+          <label className="mt-5 flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-white/80 p-4 backdrop-blur-sm">
             <span className="text-sm font-bold text-gray-700">
               Add 12 hours to the duration.
             </span>
@@ -536,14 +536,14 @@ function DurationPicker({
             />
             <span
               className={[
-                'flex h-7 w-12 shrink-0 items-center rounded-none p-1 transition',
+                'flex h-7 w-12 shrink-0 items-center rounded-md p-1 transition',
                 addHalfDay ? 'bg-gray-900' : 'bg-gray-300',
               ].join(' ')}
               aria-hidden="true"
             >
               <span
                 className={[
-                  'h-5 w-5 rounded-none bg-white shadow transition',
+                  'h-5 w-5 rounded-sm bg-white shadow transition',
                   addHalfDay ? 'translate-x-5' : 'translate-x-0',
                 ].join(' ')}
               />
@@ -565,14 +565,14 @@ function DurationPicker({
             <button
               type="button"
               onClick={onCancel}
-              className="inline-flex h-11 items-center justify-center rounded-none border border-gray-200 bg-white px-5 text-sm font-black text-gray-800 transition hover:bg-gray-100"
+              className="inline-flex h-11 items-center justify-center rounded-md border border-gray-200 bg-white px-5 text-sm font-black text-gray-800 transition hover:bg-gray-100"
             >
               Cancel
             </button>
             <button
               type="button"
               onClick={onConfirm}
-              className="inline-flex h-11 items-center justify-center rounded-none bg-gray-900 px-5 text-sm font-black text-white transition hover:bg-gray-700"
+              className="inline-flex h-11 items-center justify-center rounded-md bg-gray-900 px-5 text-sm font-black text-white transition hover:bg-gray-700"
             >
               Confirm
             </button>
@@ -727,7 +727,7 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
       id="plan-rental"
       className="relative z-20 w-full scroll-mt-28 px-0 py-0 text-gray-900"
     >
-      <div className="mx-auto w-full max-w-6xl rounded-none border border-gray-200 bg-white px-5 py-6 shadow-sm sm:px-6 sm:py-8 lg:px-8">
+      <div className="mx-auto w-full max-w-6xl rounded-lg border border-white/60 bg-white/70 px-5 py-6 shadow-[0_24px_80px_rgba(0,0,0,0.20)] backdrop-blur-xl sm:px-6 sm:py-8 lg:px-8">
         <form
           onSubmit={handleTripSearch}
           className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_auto] lg:items-end lg:justify-center"
@@ -754,7 +754,7 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
 
           <button
             type="submit"
-            className="inline-flex h-full min-h-[70px] w-full items-center justify-center gap-2.5 rounded-none bg-black px-8 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_35px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-4 focus:ring-gray-300 md:col-span-2 lg:col-span-1 lg:w-auto lg:min-w-[170px]"
+            className="inline-flex h-full min-h-[70px] w-full items-center justify-center gap-2.5 rounded-md bg-black px-8 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_35px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-4 focus:ring-gray-300 md:col-span-2 lg:col-span-1 lg:w-auto lg:min-w-[170px]"
           >
             <LandingIcon name="search" className="h-4 w-4 shrink-0" />
             <span className="whitespace-nowrap">Search Cars</span>
