@@ -6,7 +6,7 @@ import LandingIcon from './LandingIcon'
 function FieldChevron() {
   return (
     <svg
-      className="h-4 w-4 shrink-0 text-slate-700"
+      className="h-4 w-4 shrink-0 text-gray-700"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -32,12 +32,12 @@ function TripField({
 }) {
   return (
     <label className="grid gap-3">
-      <span className="text-[0.64rem] font-black uppercase tracking-[0.28em] text-slate-500">
+      <span className="text-[0.64rem] font-black uppercase tracking-[0.28em] text-gray-500">
         {label}
       </span>
 
-      <span className="flex h-14 items-center gap-3 rounded-xl border border-[#E8E2D6] bg-white px-5 shadow-[0_14px_35px_rgba(11,11,10,0.08)] transition focus-within:border-[#C8A96A] focus-within:ring-4 focus-within:ring-[#C8A96A]/20">
-        <LandingIcon name={icon} className="h-5 w-5 shrink-0 text-[#C8A96A]" />
+      <span className="flex h-14 items-center gap-3 rounded-none border border-gray-200 bg-white px-5 shadow-[0_14px_35px_rgba(0,0,0,0.06)] transition focus-within:border-black focus-within:ring-4 focus-within:ring-gray-300">
+        <LandingIcon name={icon} className="h-5 w-5 shrink-0 text-gray-700" />
 
         <input
           type={type}
@@ -45,7 +45,7 @@ function TripField({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-slate-900 outline-none placeholder:text-slate-400 [color-scheme:light]"
+          className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-gray-900 outline-none placeholder:text-gray-400 [color-scheme:light]"
         />
 
         {hasChevron ? <FieldChevron /> : null}
@@ -92,20 +92,20 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
   return (
     <section
       id="plan-rental"
-      className="scroll-mt-24 border-t border-[#E8E2D6] bg-gradient-to-b from-white via-[#F7F3EC] to-[#F7F3EC] px-4 pt-16 pb-8 sm:px-6 sm:pt-16 sm:pb-10 lg:px-8 lg:pt-20 lg:pb-12"
+      className="scroll-mt-24 border-t border-gray-200 bg-gradient-to-b from-white via-gray-50 to-gray-50 px-4 pt-16 pb-8 sm:px-6 sm:pt-16 sm:pb-10 lg:px-8 lg:pt-20 lg:pb-12"
     >
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-8 lg:grid-cols-[290px_minmax(0,1fr)] lg:items-end">
           <div>
-            <p className="text-[0.72rem] font-black uppercase tracking-[0.42em] text-[#C8A96A]">
+            <p className="text-[0.72rem] font-black uppercase tracking-[0.42em] text-gray-700">
               Trip Details
             </p>
 
-            <h2 className="mt-5 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl lg:text-[2.65rem]">
+            <h2 className="mt-5 text-4xl font-black tracking-tight text-gray-950 sm:text-5xl lg:text-[2.65rem]">
               Plan Your Rental
             </h2>
 
-            <p className="mt-5 max-w-xs text-base leading-8 text-slate-600">
+            <p className="mt-5 max-w-xs text-base leading-8 text-gray-600">
               Enter your trip details and choose the perfect vehicle for your ride.
             </p>
           </div>
@@ -146,7 +146,7 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
 
             <button
               type="submit"
-              className="inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-xl bg-[#0B0B0A] px-7 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_35px_rgba(11,11,10,0.24)] transition hover:-translate-y-0.5 hover:bg-[#C8A96A] hover:text-[#0B0B0A] focus:outline-none focus:ring-4 focus:ring-[#C8A96A]/25 md:col-span-2 lg:col-span-1 lg:w-auto lg:min-w-[170px]"
+              className="inline-flex h-14 w-full items-center justify-center gap-2.5 rounded-none bg-black px-7 text-sm font-black uppercase tracking-wide text-white shadow-[0_18px_35px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 hover:bg-gray-800 hover:text-white focus:outline-none focus:ring-4 focus:ring-gray-300 md:col-span-2 lg:col-span-1 lg:w-auto lg:min-w-[170px]"
             >
               <LandingIcon name="search" className="h-4 w-4 shrink-0" />
               <span className="whitespace-nowrap">Search Cars</span>

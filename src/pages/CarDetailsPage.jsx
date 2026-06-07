@@ -5,7 +5,7 @@ import { cx, formatPHP, getTripDetailsFromNavigation, getTripDetailsSearch } fro
 
 function DetailIcon({ path }) {
   return (
-    <svg className="h-5 w-5 text-[#C8A96A]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+    <svg className="h-5 w-5 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d={path} />
     </svg>
   )
@@ -45,8 +45,8 @@ function CarDetailsPage() {
   if (!car) {
     return (
       <section className="container-shell py-16">
-        <div className="rounded-2xl border border-slate-200 bg-white p-10 text-center shadow-sm">
-          <p className="text-xl font-black text-slate-950">Car not found.</p>
+        <div className="rounded-none border border-gray-200 bg-white p-10 text-center shadow-sm">
+          <p className="text-xl font-black text-gray-950">Car not found.</p>
           <Link to={{ pathname: '/cars', search: tripSearch }} state={tripState} className="primary-button mt-5">Back to Fleet</Link>
         </div>
       </section>
@@ -73,26 +73,26 @@ function CarDetailsPage() {
   ]
 
   return (
-    <section className="bg-[#F7F3EC]">
+    <section className="bg-gray-50">
       <div className="container-shell py-10 sm:py-14">
-        <div className="mb-8 flex flex-wrap items-center gap-2 text-[0.68rem] font-black uppercase tracking-[0.22em] text-slate-500">
-          <Link to="/" className="transition hover:text-[#A8894F]">Home</Link>
+        <div className="mb-8 flex flex-wrap items-center gap-2 text-[0.68rem] font-black uppercase tracking-[0.22em] text-gray-500">
+          <Link to="/" className="transition hover:text-black">Home</Link>
           <span>/</span>
-          <Link to={{ pathname: '/cars', search: tripSearch }} state={tripState} className="transition hover:text-[#A8894F]">Fleet</Link>
+          <Link to={{ pathname: '/cars', search: tripSearch }} state={tripState} className="transition hover:text-black">Fleet</Link>
           <span>/</span>
-          <span className="text-slate-950">{car.name}</span>
+          <span className="text-gray-950">{car.name}</span>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_420px]">
           <div>
-            <div className="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+            <div className="group relative overflow-hidden rounded-none border border-gray-200 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.10)]">
               <img src={activeImage || car.image_url} alt={car.name} className="h-72 w-full object-cover sm:h-[32rem]" />
               {hasMultipleImages ? (
                 <>
                   <button
                     type="button"
                     onClick={() => goToImage('previous')}
-                    className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-950 shadow-lg shadow-slate-950/20 transition hover:-translate-x-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#C8A96A]/25"
+                    className="absolute left-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-none bg-white/90 text-gray-950 shadow-lg shadow-gray-950/20 transition hover:-translate-x-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-gray-300"
                     aria-label="Show previous car photo"
                   >
                     <GalleryArrow direction="previous" />
@@ -100,12 +100,12 @@ function CarDetailsPage() {
                   <button
                     type="button"
                     onClick={() => goToImage('next')}
-                    className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/90 text-slate-950 shadow-lg shadow-slate-950/20 transition hover:translate-x-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-[#C8A96A]/25"
+                    className="absolute right-4 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-none bg-white/90 text-gray-950 shadow-lg shadow-gray-950/20 transition hover:translate-x-0.5 hover:bg-white focus:outline-none focus:ring-4 focus:ring-gray-300"
                     aria-label="Show next car photo"
                   >
                     <GalleryArrow direction="next" />
                   </button>
-                  <div className="absolute bottom-4 right-4 rounded-full bg-slate-950/80 px-3 py-1 text-xs font-black text-white backdrop-blur">
+                  <div className="absolute bottom-4 right-4 rounded-none bg-gray-950/80 px-3 py-1 text-xs font-black text-white backdrop-blur">
                     {activeImageIndex + 1} / {galleryImages.length}
                   </div>
                 </>
@@ -118,89 +118,89 @@ function CarDetailsPage() {
                   key={img}
                   type="button"
                   className={cx(
-                    'shrink-0 rounded-xl border bg-white p-1 transition focus:outline-none focus:ring-4 focus:ring-[#C8A96A]/20',
-                    activeImage === img ? 'border-[#C8A96A] shadow-md shadow-[#C8A96A]/15' : 'border-slate-200 hover:border-slate-400',
+                    'shrink-0 rounded-none border bg-white p-1 transition focus:outline-none focus:ring-4 focus:ring-gray-300',
+                    activeImage === img ? 'border-black shadow-md shadow-gray-400/20' : 'border-gray-200 hover:border-gray-400',
                   )}
                   onClick={() => setSelectedImage(img)}
                 >
-                  <img src={img} alt={`${car.name} thumbnail`} className="h-20 w-28 rounded-lg object-cover" />
+                  <img src={img} alt={`${car.name} thumbnail`} className="h-20 w-28 rounded-none object-cover" />
                 </button>
               ))}
             </div>
 
-            <div className="mt-8 flex flex-col gap-5 border-b border-slate-200 pb-7 sm:flex-row sm:items-end sm:justify-between">
+            <div className="mt-8 flex flex-col gap-5 border-b border-gray-200 pb-7 sm:flex-row sm:items-end sm:justify-between">
               <div>
-                <span className="rounded-full bg-[#F7F3EC] px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.2em] text-[#A8894F] ring-1 ring-[#E8E2D6]">{car.type}</span>
-                <h1 className="mt-4 text-4xl font-black tracking-tight text-slate-950 sm:text-5xl">{car.name}</h1>
-                <p className="mt-3 text-sm font-semibold text-slate-500">Inspected, insured, and ready for your next trip.</p>
+                <span className="rounded-none bg-gray-50 px-3 py-1 text-[0.65rem] font-black uppercase tracking-[0.2em] text-black ring-1 ring-gray-200">{car.type}</span>
+                <h1 className="mt-4 text-4xl font-black tracking-tight text-gray-950 sm:text-5xl">{car.name}</h1>
+                <p className="mt-3 text-sm font-semibold text-gray-500">Inspected, insured, and ready for your next trip.</p>
               </div>
               <p className="shrink-0">
-                <span className="block text-sm font-semibold text-slate-500 sm:text-right">Starting from</span>
-                <span className="text-3xl font-black text-[#A8894F]">{formatPHP(car.price_per_day)}</span>
-                <span className="ml-1 text-base font-semibold text-slate-600">/ day</span>
+                <span className="block text-sm font-semibold text-gray-500 sm:text-right">Starting from</span>
+                <span className="text-3xl font-black text-black">{formatPHP(car.price_per_day)}</span>
+                <span className="ml-1 text-base font-semibold text-gray-600">/ day</span>
               </p>
             </div>
 
             <div className="mt-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               {specs.map((spec) => (
-                <div key={spec.label} className="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm">
-                  <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-[#F7F3EC]">
+                <div key={spec.label} className="rounded-none border border-gray-200 bg-white p-5 text-center shadow-sm">
+                  <span className="mx-auto flex h-10 w-10 items-center justify-center rounded-none bg-gray-50">
                     <DetailIcon path={spec.icon} />
                   </span>
-                  <p className="mt-3 text-[0.65rem] font-black uppercase tracking-[0.18em] text-slate-500">{spec.label}</p>
-                  <p className="mt-1 font-black text-slate-950">{spec.value}</p>
+                  <p className="mt-3 text-[0.65rem] font-black uppercase tracking-[0.18em] text-gray-500">{spec.label}</p>
+                  <p className="mt-1 font-black text-gray-950">{spec.value}</p>
                 </div>
               ))}
             </div>
 
             <div className="mt-9">
-              <h2 className="text-2xl font-black text-slate-950">Overview</h2>
-              <p className="mt-4 max-w-3xl text-base leading-8 text-slate-600">{car.overview}</p>
+              <h2 className="text-2xl font-black text-gray-950">Overview</h2>
+              <p className="mt-4 max-w-3xl text-base leading-8 text-gray-600">{car.overview}</p>
             </div>
 
             <div className="mt-8 grid gap-5 md:grid-cols-2">
               <div className="card">
-                <h2 className="flex items-center gap-3 text-xl font-black text-slate-950">
+                <h2 className="flex items-center gap-3 text-xl font-black text-gray-950">
                   <DetailIcon path={iconPaths.check} />
                   Features
                 </h2>
-                <ul className="mt-5 space-y-3 text-sm font-medium text-slate-700">
-                  {(car.features || []).map((feature) => <li key={feature} className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#C8A96A]" />{feature}</li>)}
+                <ul className="mt-5 space-y-3 text-sm font-medium text-gray-700">
+                  {(car.features || []).map((feature) => <li key={feature} className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-none bg-black" />{feature}</li>)}
                 </ul>
               </div>
 
               <div className="card">
-                <h2 className="flex items-center gap-3 text-xl font-black text-slate-950">
+                <h2 className="flex items-center gap-3 text-xl font-black text-gray-950">
                   <DetailIcon path={iconPaths.info} />
                   Requirements
                 </h2>
-                <ul className="mt-5 space-y-3 text-sm font-medium text-slate-700">
-                  {(car.requirements || []).map((item) => <li key={item} className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-full bg-slate-400" />{item}</li>)}
+                <ul className="mt-5 space-y-3 text-sm font-medium text-gray-700">
+                  {(car.requirements || []).map((item) => <li key={item} className="flex gap-3"><span className="mt-2 h-1.5 w-1.5 rounded-none bg-gray-400" />{item}</li>)}
                 </ul>
               </div>
             </div>
           </div>
 
           <aside className="lg:sticky lg:top-28 lg:self-start">
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
-              <h2 className="text-2xl font-black text-slate-950">Booking Summary</h2>
-              <p className="mt-1 text-sm text-slate-600">Selected vehicle: {car.name}</p>
-              <div className="my-5 border-t border-slate-200" />
+            <div className="rounded-none border border-gray-200 bg-white p-6 shadow-[0_20px_60px_rgba(0,0,0,0.10)]">
+              <h2 className="text-2xl font-black text-gray-950">Booking Summary</h2>
+              <p className="mt-1 text-sm text-gray-600">Selected vehicle: {car.name}</p>
+              <div className="my-5 border-t border-gray-200" />
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between gap-4">
-                  <span className="text-slate-500">Daily Rate</span>
-                  <span className="font-black text-slate-950">{formatPHP(car.price_per_day)}</span>
+                  <span className="text-gray-500">Daily Rate</span>
+                  <span className="font-black text-gray-950">{formatPHP(car.price_per_day)}</span>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span className="text-slate-500">Rental Option</span>
-                  <span className="font-black text-slate-950">Self Drive or Driver</span>
+                  <span className="text-gray-500">Rental Option</span>
+                  <span className="font-black text-gray-950">Self Drive or Driver</span>
                 </div>
-                <div className="flex justify-between gap-4 border-t border-dashed border-slate-200 pt-4">
-                  <span className="text-lg font-black text-slate-950">Estimated Total</span>
-                  <span className="text-lg font-black text-[#A8894F]">{formatPHP(car.price_per_day)}</span>
+                <div className="flex justify-between gap-4 border-t border-dashed border-gray-200 pt-4">
+                  <span className="text-lg font-black text-gray-950">Estimated Total</span>
+                  <span className="text-lg font-black text-black">{formatPHP(car.price_per_day)}</span>
                 </div>
               </div>
-              <p className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-600">
+              <p className="mt-5 rounded-none bg-gray-100 p-4 text-sm leading-6 text-gray-600">
                 Final pricing may vary by rental duration, delivery, driver option, and add-ons.
               </p>
               <Link

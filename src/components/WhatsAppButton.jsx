@@ -1,4 +1,4 @@
-﻿function WhatsAppButton() {
+function WhatsAppButton() {
   const number = import.meta.env.VITE_WHATSAPP_NUMBER || '639000000000'
 
   return (
@@ -6,7 +6,7 @@
       href={`https://wa.me/${number}`}
       target="_blank"
       rel="noreferrer"
-      className="fixed bottom-5 right-5 z-50 inline-flex h-14 w-14 items-center justify-center rounded-full bg-green-500 text-white shadow-[0_18px_35px_rgba(34,197,94,0.35)] transition hover:-translate-y-1 hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-500/25"
+      className="fixed bottom-5 right-5 z-50 inline-flex h-14 w-14 items-center justify-center rounded-none bg-black text-white shadow-[0_18px_35px_rgba(0,0,0,0.18)] transition hover:-translate-y-1 hover:bg-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-300"
       aria-label="Message us on WhatsApp"
     >
       <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">

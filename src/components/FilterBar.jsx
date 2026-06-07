@@ -1,7 +1,7 @@
 function Field({ label, children }) {
   return (
     <label className="grid gap-2">
-      <span className="text-[0.66rem] font-black uppercase tracking-[0.24em] text-slate-500">{label}</span>
+      <span className="text-[0.66rem] font-black uppercase tracking-[0.24em] text-gray-500">{label}</span>
       {children}
     </label>
   )
@@ -16,7 +16,7 @@ function FilterBar({ filters, setFilters }) {
   const resetFilters = () => setFilters({ search: '', type: '', transmission: '', sort: 'asc' })
 
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-[0_18px_45px_rgba(15,23,42,0.08)] sm:p-6" aria-label="Car filters">
+    <section className="rounded-none border border-gray-200 bg-white p-4 shadow-[0_18px_45px_rgba(0,0,0,0.06)] sm:p-6" aria-label="Car filters">
       <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr_1fr_1fr_auto] lg:items-end">
         <Field label="Search Vehicle">
           <input

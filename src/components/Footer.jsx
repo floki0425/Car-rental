@@ -1,6 +1,6 @@
 function Footer() {
   return (
-    <footer className="bg-[#0B0B0A] text-slate-400">
+    <footer className="bg-black text-gray-400">
       <div className="container-shell grid gap-10 border-t border-white/10 py-12 lg:grid-cols-[1fr_auto_1fr] lg:items-center">
         <div>
           <p className="text-2xl font-black tracking-tight text-white">Hoppins</p>

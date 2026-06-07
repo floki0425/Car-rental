@@ -90,8 +90,8 @@ async function getFunctionErrorMessage(fnError, data) {
 
 function FormSection({ title, children }) {
   return (
-    <fieldset className="grid gap-4 border-t border-slate-200 pt-6 first:border-t-0 first:pt-0">
-      <legend className="mb-4 text-xl font-black text-slate-950">{title}</legend>
+    <fieldset className="grid gap-4 border-t border-gray-200 pt-6 first:border-t-0 first:pt-0">
+      <legend className="mb-4 text-xl font-black text-gray-950">{title}</legend>
       {children}
     </fieldset>
   )
@@ -99,7 +99,7 @@ function FormSection({ title, children }) {
 
 function Field({ label, children }) {
   return (
-    <label className="grid gap-2 text-sm font-semibold text-slate-700">
+    <label className="grid gap-2 text-sm font-semibold text-gray-700">
       {label}
       {children}
     </label>
@@ -238,14 +238,14 @@ function BookingPage() {
   }
 
   return (
-    <section className="bg-[#F7F3EC]">
+    <section className="bg-gray-50">
       <div className="container-shell py-12 sm:py-16">
         <div className="max-w-3xl">
           <p className="section-eyebrow">Booking Request</p>
 
           <h1 className="mt-4 section-title">Complete Your Inquiry</h1>
 
-          <p className="mt-4 text-base leading-8 text-slate-600">
+          <p className="mt-4 text-base leading-8 text-gray-600">
             {car
               ? `Please provide your details below to finalize your booking request for the ${car.name}.`
               : 'Complete the form below to continue.'}
@@ -255,7 +255,7 @@ function BookingPage() {
         <div className="mt-10 grid gap-8 lg:grid-cols-[minmax(0,1fr)_380px] xl:grid-cols-[minmax(0,1fr)_420px]">
           <form
             onSubmit={handleSubmit}
-            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-[0_20px_60px_rgba(15,23,42,0.08)] sm:p-8"
+            className="rounded-none border border-gray-200 bg-white p-5 shadow-[0_20px_60px_rgba(0,0,0,0.06)] sm:p-8"
             noValidate
           >
             <div className="grid gap-8">
@@ -364,7 +364,7 @@ function BookingPage() {
             </div>
 
             {error ? (
-              <p className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+              <p className="mt-6 rounded-none border border-gray-300 bg-gray-50 p-4 text-sm font-semibold text-gray-800">
                 {error}
               </p>
             ) : null}
@@ -379,7 +379,7 @@ function BookingPage() {
           </form>
 
           <aside className="space-y-5 lg:sticky lg:top-28 lg:self-start">
-            <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-[0_20px_60px_rgba(15,23,42,0.12)]">
+            <div className="overflow-hidden rounded-none border border-gray-200 bg-white shadow-[0_20px_60px_rgba(0,0,0,0.10)]">
               {car?.image_url ? (
                 <img
                   src={car.image_url}
@@ -391,44 +391,44 @@ function BookingPage() {
               <div className="p-6">
                 <p className="section-eyebrow">Selected Vehicle</p>
 
-                <h2 className="mt-3 text-3xl font-black tracking-tight text-slate-950">
+                <h2 className="mt-3 text-3xl font-black tracking-tight text-gray-950">
                   {car?.name || 'Selected Car'}
                 </h2>
 
-                <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold text-slate-600">
+                <div className="mt-4 flex flex-wrap gap-3 text-sm font-semibold text-gray-600">
                   <span>{car?.seats || '-'} Seats</span>
                   <span>{car?.transmission || 'Transmission'}</span>
                   <span>{car?.fuel_type || 'Fuel'}</span>
                 </div>
 
-                <div className="my-5 border-t border-slate-200" />
+                <div className="my-5 border-t border-gray-200" />
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between gap-4">
-                    <span className="text-slate-500">Daily Rate</span>
-                    <span className="font-black text-slate-950">
+                    <span className="text-gray-500">Daily Rate</span>
+                    <span className="font-black text-gray-950">
                       {formatPHP(car?.price_per_day)}
                     </span>
                   </div>
 
                   <div className="flex justify-between gap-4">
-                    <span className="text-slate-500">Rental Duration</span>
-                    <span className="font-black text-slate-950">
+                    <span className="text-gray-500">Rental Duration</span>
+                    <span className="font-black text-gray-950">
                       {rentalDays} {rentalDays === 1 ? 'Day' : 'Days'}
                     </span>
                   </div>
 
-                  <div className="flex justify-between gap-4 border-t border-dashed border-slate-200 pt-3">
-                    <span className="text-lg font-black text-slate-950">
+                  <div className="flex justify-between gap-4 border-t border-dashed border-gray-200 pt-3">
+                    <span className="text-lg font-black text-gray-950">
                       Estimated Total
                     </span>
-                    <span className="text-lg font-black text-[#A8894F]">
+                    <span className="text-lg font-black text-black">
                       {formatPHP(estimatedTotal)}
                     </span>
                   </div>
                 </div>
 
-                <p className="mt-5 rounded-2xl bg-slate-100 p-4 text-sm leading-6 text-slate-600">
+                <p className="mt-5 rounded-none bg-gray-100 p-4 text-sm leading-6 text-gray-600">
                   Pricing includes a basic estimate only. Our team will confirm final
                   rates, availability, and options.
                 </p>
@@ -436,11 +436,11 @@ function BookingPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 text-center text-sm font-black text-slate-700 shadow-sm">
+              <div className="rounded-none border border-gray-200 bg-white p-5 text-center text-sm font-black text-gray-700 shadow-sm">
                 Insured
               </div>
 
-              <div className="rounded-2xl border border-slate-200 bg-white p-5 text-center text-sm font-black text-slate-700 shadow-sm">
+              <div className="rounded-none border border-gray-200 bg-white p-5 text-center text-sm font-black text-gray-700 shadow-sm">
                 24/7 Support
               </div>
             </div>

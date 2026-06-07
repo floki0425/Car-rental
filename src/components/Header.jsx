@@ -49,19 +49,19 @@ function Header() {
   }
 
   const navLinkClass =
-    'inline-flex h-20 items-center text-[0.72rem] font-black uppercase tracking-[0.18em] text-[#111111] transition duration-200 outline-none'
+    'inline-flex h-20 items-center text-[0.72rem] font-black uppercase tracking-[0.18em] text-gray-950 transition duration-200 outline-none'
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#E8E2D6]/80 bg-white/90 shadow-sm shadow-[#0B0B0A]/[0.04] backdrop-blur-xl">
+    <header className="sticky top-0 z-50 border-b border-gray-200/80 bg-white/90 shadow-sm shadow-black/[0.04] backdrop-blur-xl">
       <div className="mx-auto flex h-20 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           to={{ pathname: '/', search: '', hash: '' }}
           onClick={handleLogoClick}
-          className="flex min-w-0 items-center gap-3 rounded-xl outline-none transition"
+          className="flex min-w-0 items-center gap-3 rounded-none outline-none transition"
           aria-label="Hoppin With Shawn's Car Rental home"
           aria-current={isHomeActive ? 'page' : undefined}
         >
-          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white">
+          <span className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-none bg-white">
             <img
               src={brandLogo}
               alt="Hoppin With Shawn's Car Rental logo"
@@ -70,10 +70,10 @@ function Header() {
           </span>
 
           <span className="hidden min-w-0 leading-none sm:block">
-            <span className="block max-w-[16rem] truncate text-[0.82rem] font-black uppercase tracking-[0.18em] text-slate-950">
+            <span className="block max-w-[16rem] truncate text-[0.82rem] font-black uppercase tracking-[0.18em] text-gray-950">
               Hoppin With Shawn&apos;s
             </span>
-            <span className="mt-1.5 block text-[0.58rem] font-black uppercase tracking-[0.32em] text-slate-600">
+            <span className="mt-1.5 block text-[0.58rem] font-black uppercase tracking-[0.32em] text-gray-600">
               Car Rental
             </span>
           </span>
@@ -97,7 +97,7 @@ function Header() {
                           {item.label}
                           <span
                             className={cx(
-                              'absolute -bottom-2 left-0 h-[2px] w-full rounded-full bg-[#C8A96A] transition-opacity duration-200',
+                              'absolute -bottom-2 left-0 h-[2px] w-full rounded-none bg-black transition-opacity duration-200',
                               active ? 'opacity-100' : 'opacity-0',
                             )}
                           />
@@ -115,7 +115,7 @@ function Header() {
                       {item.label}
                       <span
                         className={cx(
-                          'absolute -bottom-2 left-0 h-[2px] w-full rounded-full bg-[#C8A96A] transition-opacity duration-200',
+                          'absolute -bottom-2 left-0 h-[2px] w-full rounded-none bg-black transition-opacity duration-200',
                           isAnchorActive(item.hash) ? 'opacity-100' : 'opacity-0',
                         )}
                       />
@@ -130,7 +130,7 @@ function Header() {
         <div className="flex items-center gap-3">
           <a
             href="/#plan-rental"
-            className="hidden h-11 items-center justify-center gap-2 rounded-xl bg-[#0B0B0A] px-5 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(11,11,10,0.22)] outline-none transition hover:-translate-y-0.5 hover:bg-[#C8A96A] hover:text-[#0B0B0A] focus:ring-4 focus:ring-[#C8A96A]/25 lg:inline-flex"
+            className="hidden h-11 items-center justify-center gap-2 rounded-none bg-black px-5 text-xs font-black uppercase tracking-[0.14em] text-white shadow-[0_14px_30px_rgba(0,0,0,0.16)] outline-none transition hover:-translate-y-0.5 hover:bg-gray-800 hover:text-white focus:ring-4 focus:ring-gray-300 lg:inline-flex"
           >
             <CalendarIcon />
             Book Now
@@ -141,24 +141,24 @@ function Header() {
             aria-label="Toggle navigation"
             aria-expanded={isOpen}
             onClick={() => setIsOpen((open) => !open)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-white text-[#111111] shadow-sm outline-none transition hover:bg-[#F7F3EC] lg:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-none bg-white text-gray-950 shadow-sm outline-none transition hover:bg-gray-50 lg:hidden"
           >
             <span className="relative h-4 w-5">
               <span
                 className={cx(
-                  'absolute left-0 top-0 h-0.5 w-5 rounded-full bg-current transition duration-300',
+                  'absolute left-0 top-0 h-0.5 w-5 rounded-none bg-current transition duration-300',
                   isOpen && 'top-2 rotate-45',
                 )}
               />
               <span
                 className={cx(
-                  'absolute left-0 top-2 h-0.5 w-5 rounded-full bg-current transition duration-300',
+                  'absolute left-0 top-2 h-0.5 w-5 rounded-none bg-current transition duration-300',
                   isOpen && 'opacity-0',
                 )}
               />
               <span
                 className={cx(
-                  'absolute left-0 top-4 h-0.5 w-5 rounded-full bg-current transition duration-300',
+                  'absolute left-0 top-4 h-0.5 w-5 rounded-none bg-current transition duration-300',
                   isOpen && 'top-2 -rotate-45',
                 )}
               />
@@ -168,7 +168,7 @@ function Header() {
       </div>
 
       {isOpen ? (
-        <div className="border-t border-[#E8E2D6]/80 bg-white/98 shadow-xl shadow-[#0B0B0A]/5 backdrop-blur-xl lg:hidden">
+        <div className="border-t border-gray-200/80 bg-white/98 shadow-xl shadow-black/5 backdrop-blur-xl lg:hidden">
           <nav className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6" aria-label="Mobile navigation">
             <div className="grid gap-2">
               {navItems.map((item) =>
@@ -180,8 +180,8 @@ function Header() {
                     onClick={closeMenu}
                     className={({ isActive }) =>
                       cx(
-                        'rounded-xl px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-[#111111] outline-none transition hover:bg-[#F7F3EC]',
-                        isActive && !location.hash && 'bg-[#F7F3EC]',
+                        'rounded-none px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-gray-950 outline-none transition hover:bg-gray-50',
+                        isActive && !location.hash && 'bg-gray-50',
                       )
                     }
                   >
@@ -193,8 +193,8 @@ function Header() {
                     href={item.to}
                     onClick={closeMenu}
                     className={cx(
-                      'rounded-xl px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-[#111111] outline-none transition hover:bg-[#F7F3EC]',
-                      isAnchorActive(item.hash) && 'bg-[#F7F3EC]',
+                      'rounded-none px-4 py-3 text-sm font-black uppercase tracking-[0.14em] text-gray-950 outline-none transition hover:bg-gray-50',
+                      isAnchorActive(item.hash) && 'bg-gray-50',
                     )}
                   >
                     {item.label}
@@ -205,7 +205,7 @@ function Header() {
               <a
                 href="/#plan-rental"
                 onClick={closeMenu}
-                className="mt-3 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-[#0B0B0A] text-sm font-black uppercase tracking-[0.14em] text-white shadow-lg shadow-[#0B0B0A]/20 outline-none transition hover:bg-[#C8A96A] hover:text-[#0B0B0A] focus:ring-4 focus:ring-[#C8A96A]/25"
+                className="mt-3 inline-flex h-12 items-center justify-center gap-2 rounded-none bg-black text-sm font-black uppercase tracking-[0.14em] text-white shadow-lg shadow-black/20 outline-none transition hover:bg-gray-800 hover:text-white focus:ring-4 focus:ring-gray-300"
               >
                 <CalendarIcon />
                 Book Now
