@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { cleanTripDetails, getTripDetailsSearch } from '../../lib/utils'
 import LandingIcon from './LandingIcon'
@@ -15,6 +16,8 @@ const pickupTimes = [
   '16:00',
   '17:00',
 ]
+
+const timeWheelOptionHeight = 44
 
 const formatLocalDate = (date) => {
   const year = date.getFullYear()
@@ -155,6 +158,14 @@ const getCalendarDays = (monthDate) => {
   })
 }
 
+function ModalLayer({ children }) {
+  if (typeof document === 'undefined') {
+    return children
+  }
+
+  return createPortal(children, document.body)
+}
+
 function FieldChevron() {
   return (
     <svg
@@ -254,6 +265,101 @@ function ReturnDateField({ value, onOpen }) {
   )
 }
 
+function PickupTimeWheel({ value, onChange }) {
+  const wheelRef = useRef(null)
+  const scrollTimerRef = useRef(null)
+  const selectedIndex = Math.max(0, pickupTimes.indexOf(value))
+
+  useEffect(() => {
+    wheelRef.current?.scrollTo({
+      top: selectedIndex * timeWheelOptionHeight,
+      behavior: 'auto',
+    })
+  }, [selectedIndex])
+
+  useEffect(
+    () => () => {
+      if (scrollTimerRef.current) {
+        clearTimeout(scrollTimerRef.current)
+      }
+    },
+    [],
+  )
+
+  const handleScroll = () => {
+    if (scrollTimerRef.current) {
+      clearTimeout(scrollTimerRef.current)
+    }
+
+    scrollTimerRef.current = setTimeout(() => {
+      const wheel = wheelRef.current
+
+      if (!wheel) return
+
+      const nextIndex = Math.min(
+        pickupTimes.length - 1,
+        Math.max(0, Math.round(wheel.scrollTop / timeWheelOptionHeight)),
+      )
+      const nextTime = pickupTimes[nextIndex]
+
+      if (nextTime && nextTime !== value) {
+        onChange(nextTime)
+      }
+
+      wheel.scrollTo({
+        top: nextIndex * timeWheelOptionHeight,
+        behavior: 'smooth',
+      })
+    }, 120)
+  }
+
+  return (
+    <div className="relative mx-auto mt-3 w-full max-w-xs">
+      <div
+        className="pointer-events-none absolute inset-x-0 top-1/2 z-10 h-11 -translate-y-1/2 rounded-md border-y border-gray-200 bg-gray-50/80"
+        aria-hidden="true"
+      />
+      <div
+        ref={wheelRef}
+        onScroll={handleScroll}
+        className="relative h-52 snap-y snap-mandatory overflow-y-auto overscroll-contain py-[82px] scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        aria-label="Pickup time"
+      >
+        {pickupTimes.map((time, index) => {
+          const isSelected = time === value
+          const distanceFromSelected = Math.abs(index - selectedIndex)
+
+          return (
+            <button
+              key={time}
+              type="button"
+              onClick={() => onChange(time)}
+              className={[
+                'relative z-20 flex h-11 w-full snap-center items-center justify-center rounded-md text-center transition',
+                isSelected
+                  ? 'text-lg font-black text-gray-900'
+                  : distanceFromSelected === 1
+                    ? 'text-base font-bold text-gray-500'
+                    : 'text-sm font-semibold text-gray-300',
+              ].join(' ')}
+            >
+              {formatTimeLabel(time)}
+            </button>
+          )
+        })}
+      </div>
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-gray-100/90 to-transparent"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-gray-100/90 to-transparent"
+        aria-hidden="true"
+      />
+    </div>
+  )
+}
+
 function PickupDatePicker({
   draftDate,
   onCancel,
@@ -287,144 +393,131 @@ function PickupDatePicker({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/35 px-4 py-6 backdrop-blur-sm"
-      onMouseDown={onCancel}
-    >
+    <ModalLayer>
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="pickup-date-picker-title"
-        className="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-auto rounded-lg border border-white/60 bg-white/85 shadow-[0_24px_80px_rgba(0,0,0,0.24)] backdrop-blur-xl"
-        onMouseDown={(event) => event.stopPropagation()}
+        className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-black/60 px-4 py-6 backdrop-blur-sm"
+        onMouseDown={onCancel}
       >
-        <div className="rounded-t-lg bg-gray-900 px-6 py-5 text-white">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p
-                id="pickup-date-picker-title"
-                className="text-xl font-black tracking-tight"
-              >
-                Select Pickup Date
-              </p>
-              <p className="mt-2 text-sm leading-6 text-gray-300">
-                Please select the date when you will pick up the vehicle.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={onCancel}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-white/20 text-lg font-black text-white transition hover:bg-white hover:text-gray-900"
-              aria-label="Close pickup date picker"
-            >
-              x
-            </button>
-          </div>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pickup-date-picker-title"
+          className="relative z-[10000] max-h-[85vh] w-full max-w-4xl overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-2xl"
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr]">
+            <div className="border-b border-gray-200 p-4 sm:p-5 md:border-r md:border-b-0">
+              <div className="rounded-lg bg-gray-900 px-4 py-3 text-white">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p
+                      id="pickup-date-picker-title"
+                      className="text-lg font-black tracking-tight"
+                    >
+                      Select Pickup Date
+                    </p>
+                    <p className="mt-1 text-xs font-bold uppercase tracking-[0.18em] text-gray-300">
+                      {selectedYear}
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={onCancel}
+                    className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-white/20 text-base font-black text-white transition hover:bg-white hover:text-gray-900"
+                    aria-label="Close pickup date picker"
+                  >
+                    x
+                  </button>
+                </div>
 
-          <div className="mt-6 border-t border-white/15 pt-5">
-            <p className="text-sm font-bold text-gray-300">{selectedYear}</p>
-            <p className="mt-1 text-3xl font-black tracking-tight">
-              {selectedDayLabel}
-            </p>
-          </div>
-        </div>
+                <p className="mt-3 text-2xl font-black tracking-tight">
+                  {selectedDayLabel}
+                </p>
+              </div>
 
-        <div className="p-6">
-          <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-            <button
-              type="button"
-              onClick={() => changeMonth(-1)}
-              className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700 transition hover:bg-gray-100"
-              aria-label="Show previous month"
-            >
-              <span aria-hidden="true">&lt;</span>
-            </button>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-800">
-              {monthLabel}
-            </p>
-            <button
-              type="button"
-              onClick={() => changeMonth(1)}
-              className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700 transition hover:bg-gray-100"
-              aria-label="Show next month"
-            >
-              <span aria-hidden="true">&gt;</span>
-            </button>
-          </div>
-
-          <div className="mt-5 grid grid-cols-7 text-center text-[0.68rem] font-black uppercase tracking-[0.18em] text-gray-500">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayName) => (
-              <span key={dayName}>{dayName}</span>
-            ))}
-          </div>
-
-          <div className="mt-3 grid grid-cols-7 gap-1 rounded-lg border border-gray-200 bg-white/60 p-1">
-            {calendarDays.map((date) => {
-              const dateString = formatLocalDate(date)
-              const isCurrentMonth = date.getMonth() === visibleMonth.getMonth()
-              const isSelected = dateString === draftDate
-
-              return (
+              <div className="mt-4 flex items-center justify-between border-b border-gray-200 pb-3">
                 <button
-                  key={dateString}
                   type="button"
-                  onClick={() => onSelectDate(dateString)}
-                  className={[
-                    'flex aspect-square items-center justify-center rounded-md border border-gray-100 text-sm font-bold transition',
-                    isSelected
-                      ? 'bg-gray-900 text-white'
-                      : 'bg-white text-gray-700 hover:bg-gray-100',
-                    !isCurrentMonth && !isSelected ? 'text-gray-300' : '',
-                  ].join(' ')}
+                  onClick={() => changeMonth(-1)}
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700 transition hover:bg-gray-100"
+                  aria-label="Show previous month"
                 >
-                  {date.getDate()}
+                  <span aria-hidden="true">&lt;</span>
                 </button>
-              )
-            })}
-          </div>
-
-          <div className="mt-6 rounded-lg border border-gray-200 bg-gray-100/90 p-4 backdrop-blur-sm">
-            <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-gray-500">
-              Pickup Time
-            </p>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              {pickupTimes.map((time) => (
+                <p className="text-sm font-black uppercase tracking-[0.18em] text-gray-800">
+                  {monthLabel}
+                </p>
                 <button
-                  key={time}
                   type="button"
-                  onClick={() => setPickupTime(time)}
-                  className={[
-                    'rounded-md border px-3 py-2 text-sm font-bold transition',
-                    pickupTime === time
-                      ? 'border-gray-900 bg-gray-900 text-white'
-                      : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
-                  ].join(' ')}
+                  onClick={() => changeMonth(1)}
+                  className="flex h-9 w-9 items-center justify-center rounded-md border border-gray-200 text-gray-700 transition hover:bg-gray-100"
+                  aria-label="Show next month"
                 >
-                  {formatTimeLabel(time)}
+                  <span aria-hidden="true">&gt;</span>
                 </button>
-              ))}
-            </div>
-          </div>
+              </div>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <button
-              type="button"
-              onClick={onCancel}
-              className="inline-flex h-11 items-center justify-center rounded-md border border-gray-200 bg-white px-5 text-sm font-black text-gray-800 transition hover:bg-gray-100"
-            >
-              Cancel
-            </button>
-            <button
-              type="button"
-              onClick={onConfirm}
-              className="inline-flex h-11 items-center justify-center rounded-md bg-gray-900 px-5 text-sm font-black text-white transition hover:bg-gray-700"
-            >
-              Confirm
-            </button>
+              <div className="mt-3 grid grid-cols-7 text-center text-[0.64rem] font-black uppercase tracking-[0.12em] text-gray-500">
+                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((dayName) => (
+                  <span key={dayName}>{dayName}</span>
+                ))}
+              </div>
+
+              <div className="mt-2 grid grid-cols-7 gap-1 rounded-lg border border-gray-200 bg-white p-1">
+                {calendarDays.map((date) => {
+                  const dateString = formatLocalDate(date)
+                  const isCurrentMonth = date.getMonth() === visibleMonth.getMonth()
+                  const isSelected = dateString === draftDate
+
+                  return (
+                    <button
+                      key={dateString}
+                      type="button"
+                      onClick={() => onSelectDate(dateString)}
+                      className={[
+                        'flex aspect-square items-center justify-center rounded-md border border-gray-100 text-xs font-bold transition sm:text-sm',
+                        isSelected
+                          ? 'bg-gray-900 text-white'
+                          : 'bg-white text-gray-700 hover:bg-gray-100',
+                        !isCurrentMonth && !isSelected ? 'text-gray-300' : '',
+                      ].join(' ')}
+                    >
+                      {date.getDate()}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="flex flex-col p-4 sm:p-5">
+              <div className="rounded-lg border border-gray-200 bg-gray-100/90 p-4">
+                <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-gray-500">
+                  Pickup Time
+                </p>
+                <PickupTimeWheel value={pickupTime} onChange={setPickupTime} />
+              </div>
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row md:mt-auto md:pt-4">
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="inline-flex h-11 flex-1 items-center justify-center rounded-md border border-gray-200 bg-white px-5 text-sm font-black text-gray-800 transition hover:bg-gray-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={onConfirm}
+                  className="inline-flex h-11 flex-1 items-center justify-center rounded-md bg-gray-900 px-5 text-sm font-black text-white transition hover:bg-gray-700"
+                >
+                  Confirm
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </ModalLayer>
   )
 }
 
@@ -461,27 +554,28 @@ function DurationPicker({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[70] flex items-center justify-center bg-black/35 px-4 py-6 backdrop-blur-sm"
-      onMouseDown={onCancel}
-    >
+    <ModalLayer>
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="duration-picker-title"
-        className="max-h-[calc(100vh-3rem)] w-full max-w-md overflow-auto rounded-lg border border-white/60 bg-white/85 shadow-[0_24px_80px_rgba(0,0,0,0.24)] backdrop-blur-xl"
-        onMouseDown={(event) => event.stopPropagation()}
+        className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-black/60 px-4 py-6 backdrop-blur-sm"
+        onMouseDown={onCancel}
       >
-        <div className="border-b border-gray-200 px-6 py-5">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="duration-picker-title"
+          className="relative z-[10000] max-h-[85vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-2xl"
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+        <div className="border-b border-gray-200 px-5 py-4">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p
                 id="duration-picker-title"
-                className="text-xl font-black tracking-tight text-gray-900"
+                className="text-lg font-black tracking-tight text-gray-900"
               >
                 Set Duration
               </p>
-              <p className="mt-2 text-sm leading-6 text-gray-500">
+              <p className="mt-1 text-sm leading-6 text-gray-500">
                 Please set how many days would you like to rent the vehicle?
               </p>
             </div>
@@ -496,8 +590,8 @@ function DurationPicker({
           </div>
         </div>
 
-        <div className="p-6">
-          <div className="rounded-lg border border-gray-300 bg-gray-100/90 p-4 backdrop-blur-sm">
+        <div className="p-5">
+          <div className="rounded-lg border border-gray-300 bg-gray-100/90 p-4">
             <div className="flex items-center justify-between gap-4">
               <button
                 type="button"
@@ -524,7 +618,7 @@ function DurationPicker({
             </div>
           </div>
 
-          <label className="mt-5 flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-white/80 p-4 backdrop-blur-sm">
+          <label className="mt-4 flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-white p-4">
             <span className="text-sm font-bold text-gray-700">
               Add 12 hours to the duration.
             </span>
@@ -550,7 +644,7 @@ function DurationPicker({
             </span>
           </label>
 
-          <div className="my-6 border-t border-gray-200" />
+          <div className="my-5 border-t border-gray-200" />
 
           <div>
             <p className="text-[0.68rem] font-black uppercase tracking-[0.2em] text-gray-500">
@@ -561,7 +655,7 @@ function DurationPicker({
             </p>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-end">
             <button
               type="button"
               onClick={onCancel}
@@ -580,6 +674,7 @@ function DurationPicker({
         </div>
       </div>
     </div>
+    </ModalLayer>
   )
 }
 
