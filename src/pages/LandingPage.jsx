@@ -30,8 +30,9 @@ function LandingPage() {
 
   return (
     <>
-      <HeroSection heroImage={heroImage} heroHighlights={heroHighlights} />
-      <PlanRentalSection tripDetails={tripDetails} setTripDetails={setTripDetails} />
+      <HeroSection heroImage={heroImage} heroHighlights={heroHighlights}>
+        <PlanRentalSection tripDetails={tripDetails} setTripDetails={setTripDetails} />
+      </HeroSection>
       <PopularCarsSection cars={popularCars} tripDetails={tripDetails} />
       <ServicesSection services={services} conciergeStandards={conciergeStandards} />
 

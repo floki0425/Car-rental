@@ -1,13 +1,13 @@
 import LandingIcon from './LandingIcon'
 
-function HeroSection({ heroImage, heroHighlights }) {
+function HeroSection({ children, heroImage, heroHighlights }) {
   return (
     <section className="relative isolate overflow-hidden bg-black text-white">
       <img src={heroImage} alt="Premium luxury rental car" className="absolute inset-0 -z-20 h-full w-full object-cover object-center" />
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.74)_35%,rgba(0,0,0,0.24)_74%,rgba(0,0,0,0.16)_100%)]" />
       <div className="absolute inset-0 -z-10 bg-[linear-gradient(0deg,rgba(0,0,0,0.46)_0%,rgba(0,0,0,0.10)_45%,rgba(255,255,255,0.12)_100%)]" />
 
-      <div className="container-shell flex min-h-[680px] flex-col justify-end pb-24 pt-24 sm:min-h-[720px] sm:pb-28 sm:pt-28 lg:min-h-[760px] lg:pb-32">
+      <div className="container-shell relative z-10 flex min-h-[780px] flex-col justify-end pb-8 pt-24 sm:min-h-[820px] sm:pb-10 sm:pt-28 lg:min-h-[860px] lg:pb-12">
         <div className="max-w-2xl">
           <p className="text-[0.65rem] font-black uppercase tracking-[0.32em] text-gray-300">Elevated Travel Experience</p>
           <h1 className="mt-5 max-w-xl text-4xl font-black leading-[0.96] tracking-[-0.05em] text-white sm:text-6xl lg:text-7xl">
@@ -46,6 +46,12 @@ function HeroSection({ heroImage, heroHighlights }) {
             ))}
           </div>
         </div>
+
+        {children ? (
+          <div className="relative z-20 mt-10 w-full">
+            {children}
+          </div>
+        ) : null}
       </div>
     </section>
   )
