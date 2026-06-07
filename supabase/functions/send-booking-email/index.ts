@@ -17,6 +17,15 @@ const corsHeaders = {
 
 const emailPattern = /^[^\s@]+@[^\s@]+.[^\s@]+$/
 const allowedRentalOptions = new Set(['Self Drive', 'With Driver'])
+const pickupLocationLabels: Record<string, string> = {
+  within_ncr: 'WITHIN NCR',
+  outside_ncr: 'OUTSIDE NCR',
+  any_point_luzon: 'ANY POINT OF LUZON',
+}
+const rentalDurationLabels: Record<string, string> = {
+  '12_hours': '12 hours',
+  '24_hours': '24 hours',
+}
 
 const jsonResponse = (body: Record<string, unknown>, status = 200) =>
 new Response(JSON.stringify(body), {
@@ -66,6 +75,7 @@ const {
   pickup_date,
   return_date,
   pickup_location,
+  rental_duration,
   rental_option,
   message,
   car_name_snapshot,
@@ -133,16 +143,25 @@ if (!client.notification_email) {
 
 const carName = String(car_name_snapshot || 'Selected Car')
 const carPrice = Number(car_price_snapshot || 0)
+const rentalDuration = String(rental_duration || '').trim()
+const pickupLocation = String(pickup_location || '').trim()
+const pickupLocationLabel = pickupLocationLabels[pickupLocation] || pickupLocation
+const rentalDurationLabel =
+  rentalDurationLabels[rentalDuration] || rentalDuration || '-'
 const carPriceText = carPrice
-  ? `PHP ${carPrice.toLocaleString('en-PH')} / day`
+  ? `PHP ${carPrice.toLocaleString('en-PH')}`
   : 'N/A'
 
 const details = {
   car_name: carName,
+  car_rate_snapshot: carPrice || null,
   car_price_per_day: carPrice || null,
   pickup_date,
   return_date,
-  pickup_location,
+  pickup_location: pickupLocation,
+  pickup_location_label: pickupLocationLabel,
+  rental_duration: rentalDuration || null,
+  rental_duration_label: rentalDurationLabel,
   rental_option,
 }
 
@@ -169,7 +188,8 @@ if (inquiryError) {
 const safeFullName = escapeHtml(full_name)
 const safeEmail = escapeHtml(email)
 const safePhone = escapeHtml(phone)
-const safePickupLocation = escapeHtml(pickup_location)
+const safePickupLocation = escapeHtml(pickupLocationLabel)
+const safeRentalDuration = escapeHtml(rentalDurationLabel)
 const safeRentalOption = escapeHtml(rental_option)
 const safeMessage = escapeHtml(message || '-')
 const safeCarName = escapeHtml(carName)
@@ -188,7 +208,8 @@ const customerEmail = await resend.emails.send({
     <p>We received your car rental inquiry.</p>
     <ul>
       <li><strong>Car:</strong> ${safeCarName}</li>
-      <li><strong>Price:</strong> ${safeCarPriceText}</li>
+      <li><strong>Rate:</strong> ${safeCarPriceText}</li>
+      <li><strong>Rental Duration:</strong> ${safeRentalDuration}</li>
       <li><strong>Pickup Date:</strong> ${escapeHtml(pickup_date)}</li>
       <li><strong>Return Date:</strong> ${escapeHtml(return_date)}</li>
       <li><strong>Pickup Location:</strong> ${safePickupLocation}</li>
@@ -215,7 +236,8 @@ const ownerEmail = await resend.emails.send({
       <li><strong>Email:</strong> ${safeEmail}</li>
       <li><strong>Phone:</strong> ${safePhone}</li>
       <li><strong>Car:</strong> ${safeCarName}</li>
-      <li><strong>Price:</strong> ${safeCarPriceText}</li>
+      <li><strong>Rate:</strong> ${safeCarPriceText}</li>
+      <li><strong>Rental Duration:</strong> ${safeRentalDuration}</li>
       <li><strong>Pickup Date:</strong> ${escapeHtml(pickup_date)}</li>
       <li><strong>Return Date:</strong> ${escapeHtml(return_date)}</li>
       <li><strong>Pickup Location:</strong> ${safePickupLocation}</li>

@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useLocation, useParams } from 'react-router-dom'
 import carsData from '../data/fallbackCars'
+import { getRentalEstimate } from '../lib/pricing'
 import { cx, formatPHP, getTripDetailsFromNavigation, getTripDetailsSearch } from '../lib/utils'
 
 function DetailIcon({ path }) {
@@ -40,6 +41,17 @@ function CarDetailsPage() {
     return search ? `?${search}` : ''
   }, [tripDetails])
   const tripState = useMemo(() => ({ tripDetails }), [tripDetails])
+  const pricing = useMemo(
+    () =>
+      getRentalEstimate(
+        car,
+        tripDetails.pickup_location,
+        tripDetails.rental_duration,
+        tripDetails.pickup_date,
+        tripDetails.return_date,
+      ),
+    [car, tripDetails],
+  )
   const [selectedImage, setSelectedImage] = useState('')
 
   if (!car) {
@@ -136,8 +148,8 @@ function CarDetailsPage() {
               </div>
               <p className="shrink-0">
                 <span className="block text-sm font-semibold text-gray-500 sm:text-right">Starting from</span>
-                <span className="text-3xl font-black text-black">{formatPHP(car.price_per_day)}</span>
-                <span className="ml-1 text-base font-semibold text-gray-600">/ day</span>
+                <span className="text-3xl font-black text-black">{formatPHP(pricing.rate)}</span>
+                <span className="ml-1 text-base font-semibold text-gray-600">/ {pricing.unitLabel}</span>
               </p>
             </div>
 
@@ -188,16 +200,32 @@ function CarDetailsPage() {
               <div className="my-5 border-t border-gray-200" />
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between gap-4">
-                  <span className="text-gray-500">Daily Rate</span>
-                  <span className="font-black text-gray-950">{formatPHP(car.price_per_day)}</span>
+                  <span className="text-gray-500">Selected Rate</span>
+                  <span className="font-black text-gray-950">{formatPHP(pricing.rate)}</span>
                 </div>
+                {pricing.isDynamic ? (
+                  <>
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-500">Pickup Location</span>
+                      <span className="text-right font-black text-gray-950">
+                        {pricing.locationLabel}
+                      </span>
+                    </div>
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-500">Rental Duration</span>
+                      <span className="font-black text-gray-950">
+                        {pricing.durationLabel}
+                      </span>
+                    </div>
+                  </>
+                ) : null}
                 <div className="flex justify-between gap-4">
                   <span className="text-gray-500">Rental Option</span>
                   <span className="font-black text-gray-950">Self Drive or Driver</span>
                 </div>
                 <div className="flex justify-between gap-4 border-t border-dashed border-gray-200 pt-4">
                   <span className="text-lg font-black text-gray-950">Estimated Total</span>
-                  <span className="text-lg font-black text-black">{formatPHP(car.price_per_day)}</span>
+                  <span className="text-lg font-black text-black">{formatPHP(pricing.total)}</span>
                 </div>
               </div>
               <p className="mt-5 rounded-none bg-gray-100 p-4 text-sm leading-6 text-gray-600">

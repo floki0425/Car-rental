@@ -1,6 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
+import {
+  DEFAULT_PICKUP_LOCATION,
+  DEFAULT_RENTAL_DURATION,
+  PICKUP_LOCATION_OPTIONS,
+  PICKUP_LOCATION_VALUES,
+  normalizePickupLocation,
+  normalizeRentalDuration,
+} from '../../lib/pricing'
 import { cleanTripDetails, getTripDetailsSearch } from '../../lib/utils'
 import LandingIcon from './LandingIcon'
 
@@ -75,6 +83,15 @@ const getDurationDaysFromReturnDate = (pickupDate, returnDate) => {
 
   return Math.max(1, durationDays)
 }
+
+const normalizeDurationDays = (durationDays) => {
+  const numericDuration = Number(durationDays || 1)
+
+  return Number.isFinite(numericDuration) ? Math.max(1, numericDuration) : 1
+}
+
+const normalizeAddHalfDay = (value) =>
+  value === true || String(value).trim().toLowerCase() === 'true' || value === '1'
 
 const formatDateLabel = (dateString) =>
   new Intl.DateTimeFormat('en-US', {
@@ -183,40 +200,6 @@ function FieldChevron() {
   )
 }
 
-function TripField({
-  label,
-  icon,
-  name,
-  type = 'text',
-  value,
-  onChange,
-  placeholder,
-  hasChevron = false,
-}) {
-  return (
-    <label className="grid gap-3">
-      <span className="text-[0.64rem] font-black uppercase tracking-[0.28em] text-gray-500">
-        {label}
-      </span>
-
-      <span className="flex h-14 items-center gap-3 rounded-md border border-white/60 bg-white/75 px-5 shadow-[0_14px_35px_rgba(0,0,0,0.08)] backdrop-blur-xl transition focus-within:border-black focus-within:ring-4 focus-within:ring-gray-300">
-        <LandingIcon name={icon} className="h-5 w-5 shrink-0 text-gray-700" />
-
-        <input
-          type={type}
-          name={name}
-          value={value}
-          onChange={onChange}
-          placeholder={placeholder}
-          className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-gray-900 outline-none placeholder:text-gray-400 [color-scheme:light]"
-        />
-
-        {hasChevron ? <FieldChevron /> : null}
-      </span>
-    </label>
-  )
-}
-
 function PickupDateField({ value, onOpen }) {
   return (
     <label className="grid gap-3">
@@ -261,6 +244,35 @@ function ReturnDateField({ value, onOpen }) {
       </button>
 
       <input type="hidden" name="return_date" value={value} readOnly />
+    </label>
+  )
+}
+
+function PickupLocationField({ value, onChange }) {
+  return (
+    <label className="grid gap-3">
+      <span className="text-[0.64rem] font-black uppercase tracking-[0.28em] text-gray-500">
+        Pick-up Location
+      </span>
+
+      <span className="flex h-14 items-center gap-3 rounded-md border border-white/60 bg-white/75 px-5 shadow-[0_14px_35px_rgba(0,0,0,0.08)] backdrop-blur-xl transition focus-within:border-black focus-within:ring-4 focus-within:ring-gray-300">
+        <LandingIcon name="location" className="h-5 w-5 shrink-0 text-gray-700" />
+
+        <select
+          name="pickup_location"
+          value={normalizePickupLocation(value)}
+          onChange={onChange}
+          className="min-w-0 flex-1 appearance-none bg-transparent text-sm font-semibold text-gray-900 outline-none"
+        >
+          {PICKUP_LOCATION_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+
+        <FieldChevron />
+      </span>
     </label>
   )
 }
@@ -527,23 +539,30 @@ function DurationPicker({
   onCancel,
   onConfirm,
   pickupDate,
+  pickupLocation,
   pickupTime,
   setAddHalfDay,
   setDurationDays,
 }) {
-  const computedReturnDateTime = useMemo(
-    () =>
-      getComputedReturnDateTime(
-        pickupDate,
-        pickupTime,
-        durationDays,
-        addHalfDay,
-      ),
-    [addHalfDay, durationDays, pickupDate, pickupTime],
+  const isAnyPointOfLuzon =
+    normalizePickupLocation(pickupLocation) ===
+    PICKUP_LOCATION_VALUES.anyPointLuzon
+  const effectiveAddHalfDay = isAnyPointOfLuzon ? false : addHalfDay
+  const computedReturnDateTime = getComputedReturnDateTime(
+    pickupDate,
+    pickupTime,
+    durationDays,
+    effectiveAddHalfDay,
   )
   const durationLabel = `${durationDays} ${
     durationDays === 1 ? 'DAY' : 'DAYS'
   }`
+
+  useEffect(() => {
+    if (isAnyPointOfLuzon && addHalfDay) {
+      setAddHalfDay(false)
+    }
+  }, [addHalfDay, isAnyPointOfLuzon, setAddHalfDay])
 
   const decreaseDuration = () => {
     setDurationDays((currentDuration) => Math.max(1, currentDuration - 1))
@@ -618,31 +637,51 @@ function DurationPicker({
             </div>
           </div>
 
-          <label className="mt-4 flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-white p-4">
+          <label
+            className={[
+              'mt-4 flex items-center justify-between gap-4 rounded-md border border-gray-200 bg-white p-4',
+              isAnyPointOfLuzon ? 'opacity-60' : '',
+            ].join(' ')}
+          >
             <span className="text-sm font-bold text-gray-700">
               Add 12 hours to the duration.
             </span>
             <input
               type="checkbox"
-              checked={addHalfDay}
-              onChange={(event) => setAddHalfDay(event.target.checked)}
+              checked={effectiveAddHalfDay}
+              disabled={isAnyPointOfLuzon}
+              onChange={(event) => {
+                if (!isAnyPointOfLuzon) {
+                  setAddHalfDay(event.target.checked)
+                }
+              }}
               className="sr-only"
             />
             <span
               className={[
                 'flex h-7 w-12 shrink-0 items-center rounded-md p-1 transition',
-                addHalfDay ? 'bg-gray-900' : 'bg-gray-300',
+                effectiveAddHalfDay
+                  ? 'bg-gray-900'
+                  : isAnyPointOfLuzon
+                    ? 'bg-gray-200'
+                    : 'bg-gray-300',
               ].join(' ')}
               aria-hidden="true"
             >
               <span
                 className={[
                   'h-5 w-5 rounded-sm bg-white shadow transition',
-                  addHalfDay ? 'translate-x-5' : 'translate-x-0',
+                  effectiveAddHalfDay ? 'translate-x-5' : 'translate-x-0',
                 ].join(' ')}
               />
             </span>
           </label>
+
+          {isAnyPointOfLuzon ? (
+            <p className="mt-2 text-sm font-semibold leading-6 text-gray-500">
+              Any Point of Luzon is fixed for 24 hours only. Add 12 hours is not available.
+            </p>
+          ) : null}
 
           <div className="my-5 border-t border-gray-200" />
 
@@ -696,6 +735,17 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
     const pickupDate = hasTripDetail(details, 'pickup_date') && details.pickup_date
       ? details.pickup_date
       : getLocalDateString(0)
+    const pickupLocation = normalizePickupLocation(
+      hasTripDetail(details, 'pickup_location')
+        ? details.pickup_location
+        : DEFAULT_PICKUP_LOCATION,
+    )
+    const rentalDuration = normalizeRentalDuration(
+      hasTripDetail(details, 'rental_duration')
+        ? details.rental_duration
+        : DEFAULT_RENTAL_DURATION,
+      pickupLocation,
+    )
     const requestedReturnDate =
       hasTripDetail(details, 'return_date') && details.return_date
         ? details.return_date
@@ -704,13 +754,22 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
       compareLocalDateStrings(requestedReturnDate, pickupDate) <= 0
         ? getLocalDateAfter(pickupDate, 1)
         : requestedReturnDate
+    const durationDays = hasTripDetail(details, 'duration_days')
+      ? normalizeDurationDays(details.duration_days)
+      : getDurationDaysFromReturnDate(pickupDate, returnDate)
+    const addHalfDay =
+      pickupLocation === PICKUP_LOCATION_VALUES.anyPointLuzon
+        ? false
+        : hasTripDetail(details, 'add_half_day') &&
+          normalizeAddHalfDay(details.add_half_day)
 
     return {
       ...details,
-      pickup_location: hasTripDetail(details, 'pickup_location')
-        ? details.pickup_location
-        : '',
+      pickup_location: pickupLocation,
       pickup_date: pickupDate,
+      rental_duration: rentalDuration,
+      duration_days: durationDays,
+      add_half_day: addHalfDay,
       return_date: returnDate,
     }
   }, [tripDetails])
@@ -735,8 +794,15 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
       effectiveTripDetails.return_date || getLocalDateAfter(pickupDate, 1)
 
     setIsPickupPickerOpen(false)
-    setDraftDurationDays(getDurationDaysFromReturnDate(pickupDate, returnDate))
-    setAddHalfDay(false)
+    setDraftDurationDays(
+      normalizeDurationDays(effectiveTripDetails.duration_days) ||
+        getDurationDaysFromReturnDate(pickupDate, returnDate),
+    )
+    setAddHalfDay(
+      effectiveTripDetails.pickup_location === PICKUP_LOCATION_VALUES.anyPointLuzon
+        ? false
+        : normalizeAddHalfDay(effectiveTripDetails.add_half_day),
+    )
     setIsReturnPickerOpen(true)
   }
 
@@ -746,6 +812,24 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
 
     setTripDetails((prev) => {
       const currentDetails = prev || {}
+      const pickupLocation = normalizePickupLocation(
+        currentDetails.pickup_location || effectiveTripDetails.pickup_location,
+      )
+      const rentalDuration = normalizeRentalDuration(
+        currentDetails.rental_duration || effectiveTripDetails.rental_duration,
+        pickupLocation,
+      )
+      const durationDays = normalizeDurationDays(
+        currentDetails.duration_days || effectiveTripDetails.duration_days,
+      )
+      const safeAddHalfDay =
+        pickupLocation === PICKUP_LOCATION_VALUES.anyPointLuzon
+          ? false
+          : normalizeAddHalfDay(
+              hasTripDetail(currentDetails, 'add_half_day')
+                ? currentDetails.add_half_day
+                : effectiveTripDetails.add_half_day,
+            )
       const currentReturnDate =
         currentDetails.return_date || effectiveTripDetails.return_date
       const returnDate =
@@ -756,7 +840,11 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
 
       return {
         ...currentDetails,
+        pickup_location: pickupLocation,
         pickup_date: pickupDate,
+        rental_duration: rentalDuration,
+        duration_days: durationDays,
+        add_half_day: safeAddHalfDay,
         return_date: returnDate,
       }
     })
@@ -767,12 +855,22 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
 
   const confirmReturnDate = () => {
     const pickupDate = effectiveTripDetails.pickup_date || getLocalDateString(0)
+    const pickupLocation = normalizePickupLocation(
+      effectiveTripDetails.pickup_location,
+    )
+    const rentalDuration = normalizeRentalDuration(
+      effectiveTripDetails.rental_duration,
+      pickupLocation,
+    )
+    const isAnyPointOfLuzon =
+      pickupLocation === PICKUP_LOCATION_VALUES.anyPointLuzon
+    const safeAddHalfDay = isAnyPointOfLuzon ? false : addHalfDay
     const computedReturnDate = formatLocalDate(
       getComputedReturnDateTime(
         pickupDate,
         pickupTime,
         draftDurationDays,
-        addHalfDay,
+        safeAddHalfDay,
       ),
     )
     const safeReturnDate =
@@ -782,9 +880,17 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
 
     setTripDetails((prev) => ({
       ...(prev || {}),
+      pickup_location: pickupLocation,
       pickup_date: pickupDate,
+      rental_duration: rentalDuration,
+      duration_days: normalizeDurationDays(draftDurationDays),
+      add_half_day: safeAddHalfDay,
       return_date: safeReturnDate,
     }))
+
+    if (isAnyPointOfLuzon) {
+      setAddHalfDay(false)
+    }
 
     setIsReturnPickerOpen(false)
   }
@@ -792,10 +898,29 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
   const handleTripChange = (event) => {
     const { name, value } = event.target
 
-    setTripDetails((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setTripDetails((prev) => {
+      const currentDetails = prev || {}
+      const nextValue =
+        name === 'pickup_location' ? normalizePickupLocation(value) : value
+      const nextDetails = {
+        ...currentDetails,
+        [name]: nextValue,
+      }
+
+      if (name === 'pickup_location') {
+        nextDetails.rental_duration = normalizeRentalDuration(
+          nextDetails.rental_duration || DEFAULT_RENTAL_DURATION,
+          nextValue,
+        )
+
+        if (nextValue === PICKUP_LOCATION_VALUES.anyPointLuzon) {
+          nextDetails.add_half_day = false
+          setAddHalfDay(false)
+        }
+      }
+
+      return nextDetails
+    })
   }
 
   const handleTripSearch = (event) => {
@@ -827,14 +952,9 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
           onSubmit={handleTripSearch}
           className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_auto] lg:items-end lg:justify-center"
         >
-          <TripField
-            label="Pick-up Location"
-            icon="location"
-            name="pickup_location"
+          <PickupLocationField
             value={effectiveTripDetails.pickup_location}
             onChange={handleTripChange}
-            placeholder="Select location"
-            hasChevron
           />
 
           <PickupDateField
@@ -877,6 +997,7 @@ function PlanRentalSection({ tripDetails, setTripDetails }) {
           onCancel={() => setIsReturnPickerOpen(false)}
           onConfirm={confirmReturnDate}
           pickupDate={effectiveTripDetails.pickup_date}
+          pickupLocation={effectiveTripDetails.pickup_location}
           pickupTime={pickupTime}
           setAddHalfDay={setAddHalfDay}
           setDurationDays={setDraftDurationDays}

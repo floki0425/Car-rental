@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom'
 import CarCard from '../components/CarCard'
 import FilterBar from '../components/FilterBar'
 import carsData from '../data/fallbackCars'
+import { getEstimatedRentalTotal } from '../lib/rentalPricing'
 import { getTripDetailsFromNavigation, getTripDetailsSearch } from '../lib/utils'
 
 function CarsPage() {
@@ -21,8 +22,17 @@ function CarsPage() {
       .filter((car) => (!filters.type ? true : car.type === filters.type))
       .filter((car) => (!filters.transmission ? true : car.transmission === filters.transmission))
       .filter((car) => car.name.toLowerCase().includes(query))
-      .sort((a, b) => (filters.sort === 'asc' ? a.price_per_day - b.price_per_day : b.price_per_day - a.price_per_day))
-  }, [filters])
+      .sort((a, b) => {
+        const firstEstimate = getEstimatedRentalTotal(a, tripDetails)
+        const secondEstimate = getEstimatedRentalTotal(b, tripDetails)
+        const firstPrice = firstEstimate?.total || Number(a.price_per_day || 0)
+        const secondPrice = secondEstimate?.total || Number(b.price_per_day || 0)
+
+        return filters.sort === 'asc'
+          ? firstPrice - secondPrice
+          : secondPrice - firstPrice
+      })
+  }, [filters, tripDetails])
 
   return (
     <section className="bg-gray-50">

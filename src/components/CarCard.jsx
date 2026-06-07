@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { formatPHP } from '../lib/utils'
+import { formatPeso, getEstimatedRentalTotal } from '../lib/rentalPricing'
 
 function SpecIcon({ type }) {
   const paths = {
@@ -15,6 +15,10 @@ function SpecIcon({ type }) {
 }
 
 function CarCard({ car, tripSearch = '', tripState }) {
+  const tripDetails = tripState?.tripDetails || {}
+  const estimate = getEstimatedRentalTotal(car, tripDetails)
+  const hasPickupLocation = Boolean(tripDetails.pickup_location)
+
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-none border border-gray-200 bg-white shadow-[0_18px_45px_rgba(0,0,0,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.12)]">
       <div className="relative h-56 overflow-hidden bg-gray-900">
@@ -44,8 +48,26 @@ function CarCard({ car, tripSearch = '', tripState }) {
 
         <div className="mt-auto flex items-end justify-between gap-4 pt-5">
           <p>
-            <span className="block text-xl font-black text-black">{formatPHP(car.price_per_day)}</span>
-            <span className="text-sm font-medium text-gray-500">/ day</span>
+            {hasPickupLocation && estimate ? (
+              <>
+                <span className="block text-xs font-black uppercase tracking-[0.16em] text-gray-500">
+                  Estimated Total
+                </span>
+                <span className="block text-xl font-black text-black">
+                  {formatPeso(estimate.total)}
+                </span>
+                <span className="block text-xs font-semibold text-gray-500">
+                  Based on selected location and duration
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="block text-xl font-black text-black">
+                  {formatPeso(car.price_per_day)}
+                </span>
+                <span className="text-sm font-medium text-gray-500">/ day</span>
+              </>
+            )}
           </p>
           <Link
             to={{ pathname: `/cars/${car.id}`, search: tripSearch }}

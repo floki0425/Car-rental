@@ -1,8 +1,13 @@
 import { Link } from 'react-router-dom'
-import { cleanTripDetails, formatPHP, getTripDetailsSearch } from '../../lib/utils'
+import { formatPeso, getEstimatedRentalTotal } from '../../lib/rentalPricing'
+import { cleanTripDetails, getTripDetailsSearch } from '../../lib/utils'
 import LandingIcon from './LandingIcon'
 
 function PopularCarCard({ car, tripSearch = '', tripState }) {
+  const tripDetails = tripState?.tripDetails || {}
+  const estimate = getEstimatedRentalTotal(car, tripDetails)
+  const hasPickupLocation = Boolean(tripDetails.pickup_location)
+
   return (
     <article className="group flex h-full flex-col overflow-hidden rounded-none border border-gray-200/90 bg-white shadow-[0_18px_55px_rgba(0,0,0,0.06)] transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_70px_rgba(0,0,0,0.12)]">
       <div className="relative h-[15rem] overflow-hidden bg-gray-200">
@@ -32,8 +37,28 @@ function PopularCarCard({ car, tripSearch = '', tripState }) {
 
         <div className="mt-auto flex items-center justify-between gap-4 border-t border-gray-100 px-6 py-5">
           <p>
-            <span className="text-lg font-black text-black sm:text-xl">{formatPHP(car.price_per_day)}</span>
-            <span className="ml-1 text-xs font-semibold text-gray-500">/ day</span>
+            {hasPickupLocation && estimate ? (
+              <>
+                <span className="block text-[0.62rem] font-black uppercase tracking-[0.16em] text-gray-500">
+                  Estimated Total
+                </span>
+                <span className="text-lg font-black text-black sm:text-xl">
+                  {formatPeso(estimate.total)}
+                </span>
+                <span className="block text-xs font-semibold text-gray-500">
+                  Based on selected location and duration
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="text-lg font-black text-black sm:text-xl">
+                  {formatPeso(car.price_per_day)}
+                </span>
+                <span className="ml-1 text-xs font-semibold text-gray-500">
+                  / day
+                </span>
+              </>
+            )}
           </p>
           <Link
             to={{ pathname: `/booking/${car.id}`, search: tripSearch }}

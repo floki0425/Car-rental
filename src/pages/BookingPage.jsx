@@ -1,6 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import carsData from '../data/fallbackCars'
+import {
+  DEFAULT_PICKUP_LOCATION,
+  DEFAULT_RENTAL_DURATION,
+  PICKUP_LOCATION_OPTIONS,
+  RENTAL_DURATION_OPTIONS,
+  getAvailableRentalDurationOptions,
+  getRentalEstimate,
+  normalizePickupLocation,
+  normalizeRentalDuration,
+} from '../lib/pricing'
 import { supabase } from '../lib/supabase'
 import { trackLeadEvent } from '../lib/tracking'
 import { formatPHP, getTripDetailsFromNavigation } from '../lib/utils'
@@ -11,7 +21,8 @@ const initialState = {
   phone: '',
   pickup_date: '',
   return_date: '',
-  pickup_location: '',
+  pickup_location: DEFAULT_PICKUP_LOCATION,
+  rental_duration: DEFAULT_RENTAL_DURATION,
   rental_option: 'Self Drive',
   message: '',
 }
@@ -22,7 +33,8 @@ const requiredFieldMessages = {
   phone: 'Please fill up the Phone Number field.',
   pickup_date: 'Please select a Pick-up Date.',
   return_date: 'Please select a Return Date.',
-  pickup_location: 'Please enter the Pick-up Location.',
+  pickup_location: 'Please select a Pick-up Location.',
+  rental_duration: 'Please select a Rental Duration.',
   rental_option: 'Please select a Rental Option.',
 }
 
@@ -39,13 +51,22 @@ const fallbackErrorMessage =
   'Something went wrong while sending your inquiry. Please try again.'
 
 function normalizeFormState(values = {}) {
+  const pickupLocation = normalizePickupLocation(
+    values.pickup_location || DEFAULT_PICKUP_LOCATION,
+  )
+  const rentalDuration = normalizeRentalDuration(
+    values.rental_duration || DEFAULT_RENTAL_DURATION,
+    pickupLocation,
+  )
+
   return {
     full_name: values.full_name || '',
     email: values.email || '',
     phone: values.phone || '',
     pickup_date: values.pickup_date || '',
     return_date: values.return_date || '',
-    pickup_location: values.pickup_location || '',
+    pickup_location: pickupLocation,
+    rental_duration: rentalDuration,
     rental_option: values.rental_option || 'Self Drive',
     message: values.message || '',
   }
@@ -144,27 +165,43 @@ function BookingPage() {
     return new Date(form.return_date) < new Date(form.pickup_date)
   }, [form.pickup_date, form.return_date])
 
-  const rentalDays = useMemo(() => {
-    if (!form.pickup_date || !form.return_date || isInvalidDates) return 1
+  const availableDurationOptions = useMemo(
+    () => getAvailableRentalDurationOptions(form.pickup_location),
+    [form.pickup_location],
+  )
 
-    const pickup = new Date(form.pickup_date)
-    const dropoff = new Date(form.return_date)
-    const diff = Math.ceil((dropoff - pickup) / (1000 * 60 * 60 * 24)) + 1
+  const pricing = useMemo(
+    () =>
+      getRentalEstimate(
+        car,
+        form.pickup_location,
+        form.rental_duration,
+        form.pickup_date,
+        form.return_date,
+      ),
+    [
+      car,
+      form.pickup_date,
+      form.pickup_location,
+      form.rental_duration,
+      form.return_date,
+    ],
+  )
 
-    return Math.max(diff, 1)
-  }, [form.pickup_date, form.return_date, isInvalidDates])
-
-  const estimatedTotal = Number(car?.price_per_day || 0) * rentalDays
+  const estimatedTotal = isInvalidDates ? 0 : pricing.total
 
   const handleChange = (event) => {
     const { name, value } = event.target
 
-    setForm((prev) =>
-      normalizeFormState({
+    setForm((prev) => {
+      const nextValue =
+        name === 'pickup_location' ? normalizePickupLocation(value) : value
+
+      return normalizeFormState({
         ...prev,
-        [name]: value,
-      }),
-    )
+        [name]: nextValue,
+      })
+    })
 
     if (error) setError('')
   }
@@ -202,11 +239,12 @@ function BookingPage() {
         phone: form.phone.trim(),
         pickup_date: form.pickup_date,
         return_date: form.return_date,
-        pickup_location: form.pickup_location.trim(),
+        pickup_location: form.pickup_location,
+        rental_duration: pricing.duration,
         rental_option: form.rental_option,
         message: form.message.trim(),
         car_name_snapshot: car?.name || 'Selected Car',
-        car_price_snapshot: car?.price_per_day || null,
+        car_price_snapshot: pricing.rate || null,
       }
 
       const { data, error: fnError } = await supabase.functions.invoke(
@@ -226,7 +264,7 @@ function BookingPage() {
 
       trackLeadEvent({
         carName: car?.name,
-        value: car?.price_per_day,
+        value: pricing.rate,
       })
 
       navigate('/thank-you')
@@ -323,30 +361,64 @@ function BookingPage() {
                 </div>
 
                 <Field label="Pickup Location">
-                  <input
+                  <select
                     required
                     name="pickup_location"
                     value={form.pickup_location}
                     onChange={handleChange}
-                    placeholder="e.g. Makati Central Business District"
                     className="premium-input"
-                  />
+                  >
+                    {PICKUP_LOCATION_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
                 </Field>
               </FormSection>
 
               <FormSection title="Rental Options">
-                <Field label="Service Type">
-                  <select
-                    required
-                    name="rental_option"
-                    value={form.rental_option}
-                    onChange={handleChange}
-                    className="premium-input"
-                  >
-                    <option>Self Drive</option>
-                    <option>With Driver</option>
-                  </select>
-                </Field>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <Field label="Rental Duration">
+                    <select
+                      required
+                      name="rental_duration"
+                      value={pricing.duration}
+                      onChange={handleChange}
+                      className="premium-input"
+                    >
+                      {RENTAL_DURATION_OPTIONS.map((option) => {
+                        const isAvailable = availableDurationOptions.some(
+                          (durationOption) =>
+                            durationOption.value === option.value,
+                        )
+
+                        return (
+                          <option
+                            key={option.value}
+                            value={option.value}
+                            disabled={!isAvailable}
+                          >
+                            {option.label}
+                          </option>
+                        )
+                      })}
+                    </select>
+                  </Field>
+
+                  <Field label="Service Type">
+                    <select
+                      required
+                      name="rental_option"
+                      value={form.rental_option}
+                      onChange={handleChange}
+                      className="premium-input"
+                    >
+                      <option>Self Drive</option>
+                      <option>With Driver</option>
+                    </select>
+                  </Field>
+                </div>
               </FormSection>
 
               <FormSection title="Special Requests">
@@ -405,16 +477,26 @@ function BookingPage() {
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between gap-4">
-                    <span className="text-gray-500">Daily Rate</span>
+                    <span className="text-gray-500">Selected Rate</span>
                     <span className="font-black text-gray-950">
-                      {formatPHP(car?.price_per_day)}
+                      {formatPHP(pricing.rate)}
                     </span>
                   </div>
+
+                  {pricing.isDynamic ? (
+                    <div className="flex justify-between gap-4">
+                      <span className="text-gray-500">Pickup Location</span>
+                      <span className="text-right font-black text-gray-950">
+                        {pricing.locationLabel}
+                      </span>
+                    </div>
+                  ) : null}
 
                   <div className="flex justify-between gap-4">
                     <span className="text-gray-500">Rental Duration</span>
                     <span className="font-black text-gray-950">
-                      {rentalDays} {rentalDays === 1 ? 'Day' : 'Days'}
+                      {pricing.durationLabel}
+                      {pricing.periods > 1 ? ` x ${pricing.periods}` : ''}
                     </span>
                   </div>
 

@@ -7,7 +7,14 @@
 
 export const cx = (...classes) => classes.filter(Boolean).join(' ')
 
-export const tripDetailFields = ['pickup_location', 'pickup_date', 'return_date']
+export const tripDetailFields = [
+  'pickup_location',
+  'pickup_date',
+  'return_date',
+  'rental_duration',
+  'duration_days',
+  'add_half_day',
+]
 
 export const cleanTripDetails = (details = {}) =>
   tripDetailFields.reduce((cleaned, field) => {
@@ -34,6 +41,9 @@ export const getTripDetailsFromSearch = (search = '') => {
     pickup_location: params.get('pickup_location'),
     pickup_date: params.get('pickup_date'),
     return_date: params.get('return_date'),
+    rental_duration: params.get('rental_duration'),
+    duration_days: params.get('duration_days'),
+    add_half_day: params.get('add_half_day'),
   })
 }
 
